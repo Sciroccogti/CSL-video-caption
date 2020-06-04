@@ -72,7 +72,7 @@ def extract_feats(params, onWrapper):
             continue
 
         image_list = sorted(glob.glob(os.path.join(dst, '*.jpg')))
-        # 124 = 12 + 70 + 21*2
+        # 124 = 12 + 70 + 21*2, 3: x, y, confidence
         video_feats = np.zeros((len(image_list), 124, 3))
         i = 0
 
