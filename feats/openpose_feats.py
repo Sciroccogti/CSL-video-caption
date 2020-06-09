@@ -11,8 +11,6 @@ import numpy as np
 from cv2 import cv2 as cv
 from tqdm import tqdm
 
-# C, H, W = 3, 224, 224
-
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -64,9 +62,6 @@ def extract_feats(params, onWrapper):
         extract_frames(video, dst, params['overwrite'])
 
         outfile = os.path.join(dir_fc, video_id + '.npy')
-        # print(os.path.exists(outfile))
-        # print(not params['overwrite'])
-        # print(os.path.exists(outfile) and (not params['overwrite']))
         if os.path.exists(outfile) and (not params['overwrite']):
             logging.info("skipping %s" % (outfile))
             continue
@@ -77,7 +72,6 @@ def extract_feats(params, onWrapper):
         i = 0
 
         for imagePath in image_list:
-            # print(imagePath)
             try:
                 datum = op.Datum()
                 imageToProcess = cv.imread(imagePath)
@@ -90,7 +84,6 @@ def extract_feats(params, onWrapper):
                 # 12 points for upbody
                 upbody = np.concatenate(
                     (datum.poseKeypoints[0, 0:8, :3], datum.poseKeypoints[0, 15:19, :3]))
-                # print(datum.faceKeypoints.shape)
                 video_feats[i] = np.concatenate(
                     (upbody, datum.faceKeypoints[0], datum.handKeypoints[0][0], datum.handKeypoints[1][0]))
             except Exception as e:
@@ -146,4 +139,3 @@ if __name__ == '__main__':
     logging.basicConfig(filename=starttime + '.log', level=logging.INFO)
 
     extract_feats(params, opWrapper)
-
