@@ -1,0 +1,5 @@
+tqdm==4.46.0
+opencv_python==4.2.0.34
+torch==1.5.0
+numpy==1.13.3
+pretrainedmodels==0.7.4
