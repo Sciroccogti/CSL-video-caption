@@ -17,7 +17,9 @@ if not os.path.exists(params['output_dir']):
 for video in videos:
     name = str(video["video"].split(".")[0])
     segments = video["clips"]
-    feat = np.zeros((2048, len(segments)))
+    feat = np.zeros((len(segments), 2048))
+    # if len(segments) != 14:
+    #     print(name, len(segments))
     i = 0
     for segment in segments:
         feat[i] = segment["features"]

@@ -16,6 +16,17 @@ We got this:
 
 ![](../assets/G_video_00045.gif)
 
+However, we will extract c3d feats, which require the videos to have same length,
+ or we say, same frame nums. You can use `resample.py` along with `frames_count.py` to do this:
+
+```bash
+python3 dataset/frames_count.py --video_dir path/to/videos
+# You will get the statistics characteristics of your videos' frame number.
+# According them you can determine the 'target_frame' for resample.py.
+# We recommend to set the target_frame to median frame num
+python3 dataset/resample.py --video_dir path/to/videos --target_frame 224
+```
+
 ## 2: sound
 
 We extract the sound of the videos by ffmpeg.
