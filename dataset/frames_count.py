@@ -20,3 +20,4 @@ for video in videoList:
 
 print('median frame num:', np.median(frame))
 print('average frame num:', np.mean(frame))
+print(frame)
