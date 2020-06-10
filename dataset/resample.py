@@ -37,7 +37,11 @@ for video in pbar:
     video_id = video.split("/")[-1].split(".")[0]
     video_type = video.split("/")[-1].split(".")[1]
     pbar.set_description(video_id)
-    if frame == params['target_frame']:
+    if frame == 0:
+        print(video_id, 'has no frame or has an error with the video')
+        continue
+
+    if frame - params['target_frame'] < 8 and frame > params['target_frame']:
         try:
             shutil.copyfile(
                 video, params['output_dir'] + video_id + video_type)
@@ -45,7 +49,8 @@ for video in pbar:
             print(video_id, err)
     else:
         fps = cap.get(5)
-        targetfps = str(int(fps * params['target_frame'] / frame + 0.5))
+        targetfps = str(fps * (params['target_frame'] + 8) / frame)
+        # c3d extract one feature per 16 frames, plus 8 to make a median
         ffmpeg_command = ['ffmpeg', '-y', '-i', video, '-r', targetfps,
                           params['output_dir'] + video_id + '.' + video_type]
         with open(os.devnull, "w") as ffmpeg_log:
