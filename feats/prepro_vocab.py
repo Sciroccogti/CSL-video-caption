@@ -40,7 +40,7 @@ def build_vocab(vids, params):
 
 
 def main(params):
-    videos = json.load(open(params['input_json'], 'r'))['sentences']
+    videos = json.load(open(params['in_caption_json'], 'r'))['sentences']
     video_caption = {}
     for i in videos:
         if i['video_id'] not in video_caption.keys():
@@ -62,7 +62,7 @@ def main(params):
     videos = json.load(open(params['input_json'], 'r'))['videos']
     for i in videos:
         out['videos'][i['split']].append(int(i['id']))
-    json.dump(out, open(params['info_json'], 'w'))
+    json.dump(out, open(params['out_info_json'], 'w'))
     json.dump(video_caption, open(params['caption_json'], 'w'))
 
 
@@ -72,7 +72,9 @@ if __name__ == "__main__":
     # input json
     parser.add_argument('--input_json', type=str, default='data/videodatainfo_2017.json',
                         help='msr_vtt videoinfo json')
-    parser.add_argument('--info_json', default='data/info.json',
+    parser.add_argument('--in_caption_json', type=str, default='data/videodatainfo_2017.json',
+                        help='msr_vtt videoinfo json')
+    parser.add_argument('--out_info_json', default='data/info.json',
                         help='info about iw2word and word2ix')
     parser.add_argument('--caption_json', default='data/caption.json', help='caption json file')
 

@@ -29,7 +29,10 @@ class VideoDataset(Dataset):
         self.word_to_ix = info['word_to_ix']
         print('vocab size is ', len(self.ix_to_word))
         self.splits = info['videos']
-        print('number of train videos: ', len(self.splits['train']))
+
+        self.mapping = json.load(open(opt["mapping_json"]))
+
+        print('number of train videos: ', len(self.mapping))
         print('number of val videos: ', len(self.splits['val']))
         print('number of test videos: ', len(self.splits['test']))
 
@@ -52,41 +55,46 @@ class VideoDataset(Dataset):
         
         data = {}
         # 数据标号对齐
-        ix = ix+400
-        if(ix==500):
-            return data
+        ix = self.mapping[str(ix)]
         fc_feat = []
         for dir in self.feats_dir:
-            fc_feat.append(np.load(os.path.join(dir, 'G_hand_00%i.npy' % (ix))))
-        fc_feat = np.concatenate(fc_feat, axis=1)
+            fc_feat.append(np.load(os.path.join(dir, ix + '.npy')))
+        # todo 留意下面的拼接怎么拼的
+        fc_feat = np.concatenate(fc_feat, axis=1) # 40*2048
         if self.with_c3d == 1:
-            c3d_feat = np.load(os.path.join(self.c3d_feats_dir, 'G_hand_00%i.npy'%(ix)))
+            c3d_feat = np.load(os.path.join(self.c3d_feats_dir, ix + '.npy'))
             c3d_feat = np.mean(c3d_feat, axis=0, keepdims=True)
-            fc_feat = np.concatenate((fc_feat, np.tile(c3d_feat, (fc_feat.shape[0], 1))), axis=1)
+            fc_feat = np.concatenate((fc_feat, np.tile(c3d_feat, (fc_feat.shape[0], 1))), axis=1) # 40*4096
         label = np.zeros(self.max_len)
         mask = np.zeros(self.max_len)
-        captions = self.captions['G_00%i'%(ix)]['final_captions']
-        gts = np.zeros((len(captions), self.max_len))
+        captions = self.captions[ix]['final_captions']
+        # gts = np.zeros((len(captions), self.max_len))
+        gts = np.zeros((9, self.max_len))
+        # print(gts.shape)
         for i, cap in enumerate(captions):
             if len(cap) > self.max_len:
                 cap = cap[:self.max_len]
                 cap[-1] = '<eos>'
             for j, w in enumerate(cap):
+                if i >= 9:
+                    break
                 gts[i, j] = self.word_to_ix[w]
 
         # random select a caption for this video
-        cap_ix = random.randint(0, len(captions) - 1)
+        # cap_ix = random.randint(0, len(captions) - 1)
+        cap_ix = random.randint(0, 8)
         label = gts[cap_ix]
         non_zero = (label == 0).nonzero()
         mask[:int(non_zero[0][0]) + 1] = 1
-
+        
         #data = {}
         data['fc_feats'] = torch.from_numpy(fc_feat).type(torch.FloatTensor)
         data['labels'] = torch.from_numpy(label).type(torch.LongTensor)
-        data['masks'] = torch.from_numpy(mask).type(torch.FloatTensor)
+        data['masks'] =  torch.from_numpy(mask).type(torch.FloatTensor)
         data['gts'] = torch.from_numpy(gts).long()
-        data['video_ids'] = 'G_hand_00%i'%(ix)
+        data['video_ids'] = ix
         return data
 
     def __len__(self):
-        return len(self.splits[self.mode])
+        # return len(self.splits[self.mode])
+        return len(self.mapping)

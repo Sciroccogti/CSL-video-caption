@@ -19,12 +19,16 @@ def parse_opt():
         type=str,
         default='data/caption.json',
         help='path to the processed video caption json')
-
+    parser.add_argument(
+        '--mapping_json',
+        type=str,
+        default='data/mapping.json',  # 储存的是自定义编号到视频映射
+        help='path to the json file containing mapping')
     parser.add_argument(
         '--feats_dir',
         nargs='*',
         type=str,
-        default=['data/feats/'],
+        default='data/feats/',
         help='path to the directory containing the preprocessed fc feats')
 
     parser.add_argument('--c3d_feats_dir', type=str, default='data/c3d_feats')
@@ -50,8 +54,8 @@ def parse_opt():
         help='max length of captions(containing <sos>,<eos>)')
     parser.add_argument(
         "--bidirectional",
-        type=int,
-        default=0,
+        type=bool,
+        default=False,
         help="0 for disable, 1 for enable. encoder/decoder bidirectional.")
 
     parser.add_argument(
