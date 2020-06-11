@@ -10,6 +10,7 @@ We will crop the main sight of the origin video out as a new set called "video" 
 
 ```bash
 ffmpeg -i in.avi -vf crop=576:450:144:0 out.avi # crop=width:height:x:y
+# Also you can use crop.py
 ```
 
 We got this:

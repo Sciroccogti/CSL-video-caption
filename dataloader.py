@@ -50,8 +50,8 @@ class VideoDataset(Dataset):
         # which part of data to load
         if self.mode == 'val':
             ix += len(self.splits['train'])
-        elif self.mode == 'test':
-            ix = ix + len(self.splits['train']) + len(self.splits['val'])
+        # elif self.mode == 'test':
+            # ix = ix + len(self.splits['train']) + len(self.splits['val'])
         
         data = {}
         # 数据标号对齐
@@ -86,7 +86,7 @@ class VideoDataset(Dataset):
         label = gts[cap_ix]
         non_zero = (label == 0).nonzero()
         mask[:int(non_zero[0][0]) + 1] = 1
-        
+        print(label.shape)
         #data = {}
         data['fc_feats'] = torch.from_numpy(fc_feat).type(torch.FloatTensor)
         data['labels'] = torch.from_numpy(label).type(torch.LongTensor)

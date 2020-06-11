@@ -14,6 +14,9 @@ videos = json.load(open(params['json'], 'r'))
 if not os.path.exists(params['output_dir']):
     os.makedirs(params['output_dir'])
 
+if not params['output_dir'].endswith('/'):
+    params['output_dir'] += '/'
+
 for video in videos:
     name = str(video["video"].split(".")[0])
     segments = video["clips"]

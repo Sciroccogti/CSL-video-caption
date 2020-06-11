@@ -1,5 +1,8 @@
 data/
+data00400/
 models
+results/
+save/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
