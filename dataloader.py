@@ -50,8 +50,8 @@ class VideoDataset(Dataset):
         # which part of data to load
         if self.mode == 'val':
             ix += len(self.splits['train'])
-        # elif self.mode == 'test':
-            # ix = ix + len(self.splits['train']) + len(self.splits['val'])
+        elif self.mode == 'test':
+            ix = ix + len(self.splits['train']) + len(self.splits['val'])
         
         data = {}
         # 数据标号对齐
