@@ -1,7 +1,20 @@
-import re
-import json
 import argparse
+import json
+import random
+import re
+
 import numpy as np
+
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 def build_vocab(vids, params):
@@ -24,7 +37,7 @@ def build_vocab(vids, params):
     print('number of UNKs: %d/%d = %.2f%%' %
           (bad_count, total_words, bad_count * 100.0 / total_words))
     # lets now produce the final annotations
-    if bad_count > 0: #只出现一次就是bad word 不用
+    if bad_count > 0:  # 只出现一次就是bad word 不用
         # additional special UNK token we will use below to map infrequent words to
         print('inserting the special UNK token')
         vocab.append('<UNK>')
@@ -41,6 +54,8 @@ def build_vocab(vids, params):
 
 def main(params):
     videos = json.load(open(params['in_caption_json'], 'r'))['sentences']
+    if params['errors_json']:
+        error_list = json.load(open(params["errors_json"]))["errors"]
     video_caption = {}
     for i in videos:
         if i['video_id'] not in video_caption.keys():
@@ -60,8 +75,32 @@ def main(params):
     out['word_to_ix'] = wtoi
     out['videos'] = {'train': [], 'val': [], 'test': []}
     videos = json.load(open(params['input_json'], 'r'))['videos']
-    for i in videos:
-        out['videos'][i['split']].append(int(i['id']))
+    if params['bad_dataset']:
+        train = []
+        test = []
+        val = []
+
+        for i in videos:
+            if not params['errors_json'] or not i in error_list:
+                train.append(i['id'])
+        
+        total = len(train)
+        random.shuffle(train)
+
+        for i in range(params['val_percent'] * total // 100):
+            val.append(train.pop(total - i - 1))
+        
+        total = len(train)
+        for i in range(params['test_percent'] * total // 100):
+            test.append(train.pop(total - i - 1))
+
+        out['videos']['train'] = train
+        out['videos']['val'] = val
+        out['videos']['test'] = test
+    else:
+        for i in videos:
+            out['videos'][i['split']].append(int(i['id']))
+    
     json.dump(out, open(params['out_info_json'], 'w'))
     json.dump(video_caption, open(params['caption_json'], 'w'))
 
@@ -74,14 +113,24 @@ if __name__ == "__main__":
                         help='msr_vtt videoinfo json')
     parser.add_argument('--in_caption_json', type=str, default='data/videodatainfo_2017.json',
                         help='msr_vtt videoinfo json')
+    parser.add_argument('--errors_json', type=str, default=None,
+                        help='path to the json which contains name of error videos, wont use it if leaving empty')
+
+    # ouput json
     parser.add_argument('--out_info_json', default='data/info.json',
                         help='info about iw2word and word2ix')
-    parser.add_argument('--caption_json', default='data/caption.json', help='caption json file')
+    parser.add_argument('--caption_json', default='data/caption.json',
+                        help='caption json file')
 
-
+    # parameters
     parser.add_argument('--word_count_threshold', default=1, type=int,
                         help='only words that occur more than this number of times will be put in vocab')
-
+    parser.add_argument('--val_percent', type=int, default=0,
+                        help='percent of dataset for validate')
+    parser.add_argument('--test_percent', type=int, default=10,
+                        help='percent of dataset for test')
+    parser.add_argument('--bad_dataset', type=str2bool, default=False,
+                        help='set True if the dataset sets all videos for training')
     args = parser.parse_args()
     params = vars(args)  # convert to ordinary dict
     main(params)
