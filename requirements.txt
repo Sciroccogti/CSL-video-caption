@@ -1,5 +1,12 @@
-tqdm==4.46.0
-opencv_python==4.2.0.34
-torch==1.5.0
-numpy==1.13.3
-pretrainedmodels==0.7.4
+torch>=1.5.0
+pandas>=0.22.0
+numpy>=1.15
+matplotlib>=2.1.1
+tqdm>=4.46.0
+opencv_python>=4.2.0.34
+pretrainedmodels>=0.7.4
+scipy>=1.4.1
+audioread==2.1.8
+librosa==0.7.2
+scikit_learn==0.23.1
+spice==0.12
