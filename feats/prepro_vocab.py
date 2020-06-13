@@ -81,7 +81,7 @@ def main(params):
         val = []
 
         for i in videos:
-            if not params['errors_json'] or not i in error_list:
+            if not params['errors_json'] or not i['id'] in error_list:
                 train.append(i['id'])
         
         total = len(train)
