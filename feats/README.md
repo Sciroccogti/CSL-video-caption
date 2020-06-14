@@ -23,3 +23,7 @@ We did this in [previous work](https://github.com/Paymemoney/Video-Caption), you
 ## 3: openpose features of sign language
 
 Use `openpose_feats.py` to do that. You need to have [openpose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) installed.
+
+## 4: preprocess
+
+`prepro_feats.py`, `prepro_vocab.py`

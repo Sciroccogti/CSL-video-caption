@@ -5,7 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--json", default='./output.json')
-parser.add_argument("--output_dir", default='data/3dfeature/')
+parser.add_argument("--output_dir", default='data/feats/c3d_feats/')
 args = parser.parse_args()
 params = vars(args)
 

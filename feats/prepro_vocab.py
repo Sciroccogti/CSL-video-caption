@@ -58,6 +58,10 @@ def main(params):
         error_list = json.load(open(params["errors_json"]))["errors"]
     video_caption = {}
     for i in videos:
+        try:
+            i['video_id']
+        except:
+            print(i)
         if i['video_id'] not in video_caption.keys():
             video_caption[i['video_id']] = {'captions': []}
         video_caption[i['video_id']]['captions'].append(i['caption'])
