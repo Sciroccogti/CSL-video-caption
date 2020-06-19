@@ -58,16 +58,18 @@ class VideoDataset(Dataset):
         label = np.zeros(self.max_len)
         mask = np.zeros(self.max_len)
         captions = self.captions['G_%05i'%(id)]['final_captions']
-        gts = np.zeros((len(captions), self.max_len))
+        gts = np.zeros((9, self.max_len))
         for i, cap in enumerate(captions):
             if len(cap) > self.max_len:
                 cap = cap[:self.max_len]
                 cap[-1] = '<eos>'
             for j, w in enumerate(cap):
+                if i >= 9:
+                    break
                 gts[i, j] = self.word_to_ix[w]
 
         # random select a caption for this video
-        cap_ix = random.randint(0, len(captions) - 1)
+        cap_ix = random.randint(0, 8)
         label = gts[cap_ix]
         non_zero = (label == 0).nonzero()
         mask[:int(non_zero[0][0]) + 1] = 1
