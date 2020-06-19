@@ -6,7 +6,7 @@ Below is an example of our origin dataset（720*576）:
 
 ## 1: video
 
-### Normalize frame nums
+### normalize frame nums
 
 we will extract c3d feats, which require the videos to have same length,
  or we say, same frame nums. You can use `resample.py` along with `frames_count.py` to do this:
