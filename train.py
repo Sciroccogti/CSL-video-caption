@@ -37,13 +37,17 @@ def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
             # print(data)
             torch.cuda.synchronize()
             fc_feats = data['fc_feats'].cuda()
+            # voice_feats = data['voice_feats'].cuda()
+            hand_feats = data['hand_feats'].cuda()
             labels = data['labels'].cuda()
             masks = data['masks'].cuda()
             #print(sc_flag)
             optimizer.zero_grad()
             if not sc_flag:
-                seq_probs, _ = model(fc_feats, labels, 'train')
+                # seq_probs, _ = model(fc_feats, voice_feats, hand_feats, labels, 'train')
+                seq_probs, _ = model(fc_feats, hand_feats, labels, 'train')
                 loss = crit(seq_probs, labels[:, 1:], masks[:, 1:])
+            # todo 下面else部分没有修改声音和手语的内容
             else:
                 seq_probs, seq_preds = model(
                     fc_feats, mode='inference', opt=opt)
@@ -99,6 +103,23 @@ def main(opt):
             input_dropout_p=opt["input_dropout_p"],
             rnn_cell=opt['rnn_type'],
             rnn_dropout_p=opt["rnn_dropout_p"])
+        # # 声音encoder
+        # encoder_voice = EncoderRNN(
+        #     opt["dim_voice"],
+        #     opt["dim_hidden"],
+        #     bidirectional=opt["bidirectional"],
+        #     input_dropout_p=opt["input_dropout_p"],
+        #     rnn_cell=opt['rnn_type'],
+        #     rnn_dropout_p=opt["rnn_dropout_p"])
+        # 手语encoder
+        encoder_hand = EncoderRNN(
+            opt["dim_hand"],
+            opt["dim_hidden"],
+            bidirectional=opt["bidirectional"],
+            input_dropout_p=opt["input_dropout_p"],
+            rnn_cell=opt['rnn_type'],
+            rnn_dropout_p=opt["rnn_dropout_p"])
+
         decoder = DecoderRNN(
             opt["vocab_size"],
             opt["max_len"],
@@ -108,7 +129,8 @@ def main(opt):
             rnn_cell=opt['rnn_type'],
             rnn_dropout_p=opt["rnn_dropout_p"],
             bidirectional=opt["bidirectional"])
-        model = S2VTAttModel(encoder, decoder)
+        # model = S2VTAttModel(encoder, encoder_voice, encoder_hand, decoder)
+        model = S2VTAttModel(encoder, encoder_hand, decoder)
     model = model.cuda()
     crit = utils.LanguageModelCriterion()
     rl_crit = utils.RewardCriterion()
