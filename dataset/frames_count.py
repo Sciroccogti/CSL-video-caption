@@ -18,6 +18,7 @@ for video in videoList:
     cap = cv.VideoCapture(video)
     frame.append(cap.get(7))
 
+print('number:', len(frame))
 print('median frame num:', np.median(frame))
 print('average frame num:', np.mean(frame))
 print('minimum frame num:', np.min(frame))

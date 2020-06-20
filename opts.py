@@ -66,6 +66,11 @@ def parse_opt():
         default=512,
         help='size of the rnn hidden layer')
     parser.add_argument(
+        '--dim_hand_hidden',
+        type=int,
+        default=512,
+        help='size of the openpose hidden layer')
+    parser.add_argument(
         '--num_layers', type=int, default=1, help='number of layers in the RNN')
     parser.add_argument(
         '--input_dropout_p',
@@ -91,7 +96,11 @@ def parse_opt():
         type=int,
         default=2048,
         help='dim of features of video frames')
-
+    parser.add_argument(
+        '--dim_hand',
+        type=int,
+        default=248,
+        help='dim of features of openpose')
     # Optimization: General
 
     parser.add_argument(

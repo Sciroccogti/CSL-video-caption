@@ -59,6 +59,7 @@ class VideoDataset(Dataset):
             fc_feat = np.concatenate((fc_feat, np.tile(c3d_feat, (fc_feat.shape[0], 1))), axis=1)
         
         hand_feat = np.load(os.path.join(self.hand_feats_dir, 'handG_%05i.npy'%(id)))
+        hand_feat = np.reshape(hand_feat[:224, :, :2], (224, 248))
         # hand_feat = np.mean(hand_feat, axis=0, keepdims=True)
 
         label = np.zeros(self.max_len)

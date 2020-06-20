@@ -114,7 +114,7 @@ def main(opt):
         # 手语encoder
         encoder_hand = EncoderRNN(
             opt["dim_hand"],
-            opt["dim_hidden"],
+            opt["dim_hand_hidden"],
             bidirectional=opt["bidirectional"],
             input_dropout_p=opt["input_dropout_p"],
             rnn_cell=opt['rnn_type'],
