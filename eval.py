@@ -80,7 +80,6 @@ def main(opt):
     elif opt["model"] == "S2VTAttModel":
         encoder = EncoderRNN(opt["dim_vid"], opt["dim_hidden"], bidirectional=opt["bidirectional"],
                              input_dropout_p=opt["input_dropout_p"], rnn_dropout_p=opt["rnn_dropout_p"])
-
         encoder_hand = EncoderRNN(
             opt["dim_hand"],
             opt["dim_hand_hidden"],
@@ -88,7 +87,7 @@ def main(opt):
             input_dropout_p=opt["input_dropout_p"],
             rnn_cell=opt['rnn_type'],
             rnn_dropout_p=opt["rnn_dropout_p"])
-
+    
         decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
                              input_dropout_p=opt["input_dropout_p"],
                              rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])

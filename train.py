@@ -126,7 +126,7 @@ def main(opt):
         decoder = DecoderRNN(
             opt["vocab_size"],
             opt["max_len"],
-            opt["dim_hidden"],
+            opt["dim_hidden"] + opt["dim_hand_hidden"],
             opt["dim_word"],
             input_dropout_p=opt["input_dropout_p"],
             rnn_cell=opt['rnn_type'],

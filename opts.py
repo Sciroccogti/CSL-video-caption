@@ -57,7 +57,7 @@ def parse_opt():
     parser.add_argument(
         "--bidirectional",
         type=bool,
-        default=False,
+        default=True,
         help="0 for disable, 1 for enable. encoder/decoder bidirectional.")
 
     parser.add_argument(
@@ -68,7 +68,7 @@ def parse_opt():
     parser.add_argument(
         '--dim_hand_hidden',
         type=int,
-        default=512,
+        default=256,
         help='size of the openpose hidden layer')
     parser.add_argument(
         '--num_layers', type=int, default=1, help='number of layers in the RNN')
@@ -122,7 +122,7 @@ def parse_opt():
     )
 
     parser.add_argument(
-        '--learning_rate', type=float, default=4e-4, help='learning rate')
+        '--learning_rate', type=float, default=1e-4, help='learning rate')
 
     parser.add_argument(
         '--learning_rate_decay_every',
