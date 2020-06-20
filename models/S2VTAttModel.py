@@ -35,9 +35,7 @@ class S2VTAttModel(nn.Module):
         # todo 我不知道下面的应该是哪一维进行拼接，到时候输出测试一下
         # encoder_outputs = torch.cat([encoder_outputs1, encoder_outputs2, encoder_outputs3], 2)
         # encoder_hidden = torch.cat([encoder_hidden1, encoder_hidden2, encoder_hidden3], 2)
-        print('encoder_outputs1', encoder_outputs1.shape)
-        print('encoder_outputs3', encoder_outputs3.shape)
-        encoder_outputs = torch.cat([encoder_outputs1, encoder_outputs3], 1)
-        encoder_hidden = torch.cat([encoder_hidden1, encoder_hidden3], 1)
+        encoder_outputs = torch.cat([encoder_outputs1, encoder_outputs3], 2)
+        encoder_hidden = torch.cat([encoder_hidden1, encoder_hidden3], 2)
         seq_prob, seq_preds = self.decoder(encoder_outputs, encoder_hidden, target_variable, mode, opt)
         return seq_prob, seq_preds
