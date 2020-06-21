@@ -88,7 +88,7 @@ def main(opt):
             rnn_cell=opt['rnn_type'],
             rnn_dropout_p=opt["rnn_dropout_p"])
     
-        decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
+        decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"]+opt['dim_hand_hidden'], opt["dim_word"],
                              input_dropout_p=opt["input_dropout_p"],
                              rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
         model = S2VTAttModel(encoder, encoder_hand, decoder).cuda()
