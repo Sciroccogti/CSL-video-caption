@@ -30,9 +30,19 @@ python3 dataset/resample.py --video_dir path/to/videos --target_frame 224
 
 ## 2: sound
 
-We extract the sound of the videos by ffmpeg.
+We extract the sound of the videos by ffmpeg:
+```bash
+python3 dataset/audio_extract.py --video_dir path/to/videos --target_duration 5.261
+```
+
+We need to normalize the length of mfcc feats, so the extracted audios should have
+ same durations. In our test, we want the length of mfcc feats be as long as those
+ of video feats, which are 224. Thus we should set the target_duration as 5.261
+ = (224 + 8) / 44.1, where `+8` ensures the length is larger than 224 and smaller
+ than 224 + 16
 
 ## 3: hand
+
 We will crop the sign language part out as a new set called "hand" (144*114): 
 
 ```bash

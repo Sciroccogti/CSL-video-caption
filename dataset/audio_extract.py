@@ -7,10 +7,11 @@ import glob
 import os
 import shutil
 import subprocess
-from tqdm import tqdm
 
+import librosa
 import numpy as np
 from cv2 import cv2 as cv
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--video_dir")
@@ -22,6 +23,9 @@ params = vars(args)
 
 videoList = glob.glob(os.path.join(params['video_dir'], '*.mp4'))
 videoList += glob.glob(os.path.join(params['video_dir'], '*.avi'))
+videoList += glob.glob(os.path.join(params['video_dir'], '*.wav'))
+videoList += glob.glob(os.path.join(params['video_dir'], '*.aac'))
+videoList += glob.glob(os.path.join(params['video_dir'], '*.m4a'))
 videoList.sort()
 pbar = tqdm(videoList)
 
@@ -32,32 +36,38 @@ if not params['output_dir'].endswith('/'):
     params['output_dir'] += '/'
 
 for video in pbar:
-    cap = cv.VideoCapture(video)
-    frame = cap.get(7)
     video_id = video.split("/")[-1].split(".")[0]
     video_type = video.split("/")[-1].split(".")[1]
     pbar.set_description(video_id)
-    if frame == 0:
-        print(video_id, 'has no frame or has an error with the video')
-        continue
 
-    else:
+    if video_type == 'mp4' or video_type =='avi':
+        cap = cv.VideoCapture(video)
+        frame = cap.get(7)
+        if frame == 0:
+            print(video_id, 'has no frame or has an error with the video')
+            continue
         duration = cap.get(7) / cap.get(5)
-        scale = duration / params['target_duration']
-        tempo = ''
+    else:
+        y, _ = librosa.load(video)
+        duration = librosa.get_duration(y)
+        if duration == 0:
+            print(video_id, 'has no frame or has an error with the audio')
+            continue
+    scale = duration / params['target_duration']
+    tempo = ''
 
-        while scale > 2.0 or scale < 0.5:
-            if scale > 2.0:
-                tempo += 'atempo=2.0,'
-                scale /= 2.0
-            else:
-                tempo += 'atempo=0.5,'
-                scale /= 0.5
+    while scale > 2.0 or scale < 0.5:
+        if scale > 2.0:
+            tempo += 'atempo=2.0,'
+            scale /= 2.0
+        else:
+            tempo += 'atempo=0.5,'
+            scale /= 0.5
 
-        tempo += 'atempo=%f' % scale
+    tempo += 'atempo=%f' % scale
 
-        ffmpeg_command = ['ffmpeg', '-y', '-i', video, '-filter:a', tempo,
-                          params['output_dir'] + video_id + '.aac']
-        with open(os.devnull, "w") as ffmpeg_log:
-            subprocess.call(ffmpeg_command, stdout=ffmpeg_log,
-                            stderr=ffmpeg_log)
+    ffmpeg_command = ['ffmpeg', '-y', '-i', video, '-filter:a', tempo,
+                        params['output_dir'] + video_id + '.aac']
+    with open(os.devnull, "w") as ffmpeg_log:
+        subprocess.call(ffmpeg_command, stdout=ffmpeg_log,
+                        stderr=ffmpeg_log)

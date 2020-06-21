@@ -7,7 +7,7 @@ def parse_opt():
     parser.add_argument(
         '--input_json',
         type=str,
-        default='data/English_caption(400-590).json',
+        default='data/english_caption_2018.json',
         help='path to the json file containing video info')
     parser.add_argument(
         '--info_json',
@@ -19,11 +19,6 @@ def parse_opt():
         type=str,
         default='data/caption.json',
         help='path to the processed video caption json')
-    parser.add_argument(
-        '--mapping_json',
-        type=str,
-        default='data/mapping.json',  # 储存的是自定义编号到视频映射
-        help='path to the json file containing mapping')
     parser.add_argument(
         '--feats_dir',
         nargs='*',
