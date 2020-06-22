@@ -1,4 +1,6 @@
 import torch.nn as nn
+import numpy as np
+import torch
 
 
 class EncoderRNN(nn.Module):
@@ -56,3 +58,45 @@ class EncoderRNN(nn.Module):
         self.rnn.flatten_parameters()
         output, hidden = self.rnn(vid_feats)
         return output, hidden
+
+    def forward2(self, vid_feats, hand_pro):
+        """
+        Applies a multi-layer RNN to an input sequence.
+        Args:
+            input_var (batch, seq_len): tensor containing the features of the input sequence.
+            input_lengths (list of int, optional): A list that contains the lengths of sequences
+              in the mini-batch
+        Returns: output, hidden
+            - **output** (batch, seq_len, hidden_size): variable containing the encoded features of the input sequence
+            - **hidden** (num_layers * num_directions, batch, hidden_size): variable containing the features in the hidden state h
+        """
+        batch_size, seq_len, dim_vid = vid_feats.size()
+        vid_feats = self.dropout(self.input_dropout_p, hand_pro, vid_feats)
+        vid_feats = self.vid2hid(vid_feats.view(-1, dim_vid))
+        # vid_feats = self.input_dropout(vid_feats)
+        # todo 要把置信度矩阵传入进来
+        
+        vid_feats = vid_feats.view(batch_size, seq_len, self.dim_hidden)
+        self.rnn.flatten_parameters()
+        output, hidden = self.rnn(vid_feats)
+        return output, hidden
+
+    def dropout(self, basepro, zhixindu, input):
+        """
+        :param basepro: 基础dropout概率 basepro<0.6666666
+        :param zhixindu: 输入的置信度矩阵
+        :param input: 需要dropout的特征
+        :return: 处理过的特征
+        """
+        # zhixindu = zhixindu.reshape((-1,zhixindu.shape[2]))
+        drop_out = 1 - ((1 - zhixindu) * basepro + basepro / 2)
+        m = zhixindu.shape[0]
+        n =  zhixindu.shape[1]
+        r = zhixindu.shape[2]
+        assert (input.shape[0] == m)
+        assert (input.shape[1] == n)
+        assert (input.shape[2] == r)
+        drop_out = torch.rand(m, n, r).cuda() + drop_out
+        b = torch.ones(m, n, r).cuda()
+        drop_out = drop_out > b + 0  # 这里生成0 1矩阵
+        return drop_out * input

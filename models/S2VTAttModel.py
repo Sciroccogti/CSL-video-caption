@@ -16,7 +16,7 @@ class S2VTAttModel(nn.Module):
         self.encoder_hand = encoder_hand
         self.decoder = decoder
 
-    def forward(self, vid_feats, hand_feats, target_variable=None,
+    def forward(self, vid_feats, hand_feats, hand_pro, target_variable=None,
                 mode='train', opt={}):
         """
 
@@ -31,7 +31,7 @@ class S2VTAttModel(nn.Module):
         encoder_outputs1, encoder_hidden1 = self.encoder(vid_feats)
         # todo 修改下面的vid_feats，变成声音和手语的特征,同时要传入参数
         # encoder_outputs2, encoder_hidden2 = self.encoder_voice(voice_feats)
-        encoder_outputs3, encoder_hidden3 = self.encoder_hand(hand_feats)
+        encoder_outputs3, encoder_hidden3 = self.encoder_hand.forward2(hand_feats, hand_pro)
         # todo 我不知道下面的应该是哪一维进行拼接，到时候输出测试一下
         # encoder_outputs = torch.cat([encoder_outputs1, encoder_outputs2, encoder_outputs3], 2)
         # encoder_hidden = torch.cat([encoder_hidden1, encoder_hidden2, encoder_hidden3], 2)

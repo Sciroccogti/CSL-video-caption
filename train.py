@@ -41,13 +41,14 @@ def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
             fc_feats = data['fc_feats'].cuda()
             # voice_feats = data['voice_feats'].cuda()
             hand_feats = data['hand_feats'].cuda()
+            hand_pro = data['hand_pro'].cuda()
             labels = data['labels'].cuda()
             masks = data['masks'].cuda()
             #print(sc_flag)
             optimizer.zero_grad()
             if not sc_flag:
                 # seq_probs, _ = model(fc_feats, voice_feats, hand_feats, labels, 'train')
-                seq_probs, _ = model(fc_feats, hand_feats, labels, 'train')
+                seq_probs, _ = model(fc_feats, hand_feats, hand_pro, labels, 'train')
                 loss = crit(seq_probs, labels[:, 1:], masks[:, 1:])
             # todo 下面else部分没有修改声音和手语的内容
             else:

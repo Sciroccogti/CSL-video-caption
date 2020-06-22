@@ -39,6 +39,7 @@ def test(model, crit, dataset, vocab, opt):
         # forward the model to get loss
         fc_feats = data['fc_feats'].cuda()
         hand_feats = data['hand_feats'].cuda()
+        hand_pro = data['hand_pro'].cuda()
         labels = data['labels'].cuda()
         masks = data['masks'].cuda()
         video_ids = data['video_ids']
@@ -46,7 +47,7 @@ def test(model, crit, dataset, vocab, opt):
         # forward the model to also get generated samples for each image
         with torch.no_grad():
             seq_probs, seq_preds = model(
-                fc_feats, hand_feats, mode='inference', opt=opt)
+                fc_feats, hand_feats, hand_pro, mode='inference', opt=opt)
 
         sents = utils.decode_sequence(vocab, seq_preds)
 
