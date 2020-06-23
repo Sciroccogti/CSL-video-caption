@@ -38,21 +38,23 @@ def test(model, crit, dataset, vocab, opt):
     for data in loader:
         # forward the model to get loss
         fc_feats = data['fc_feats'].cuda()
+        hand_feats = data['hand_feats'].cuda()
+        hand_pro = data['hand_pro'].cuda()
         labels = data['labels'].cuda()
         masks = data['masks'].cuda()
         video_ids = data['video_ids']
-      
+
         # forward the model to also get generated samples for each image
         with torch.no_grad():
             seq_probs, seq_preds = model(
-                fc_feats, mode='inference', opt=opt)
+                fc_feats, hand_feats, hand_pro, mode='inference', opt=opt)
 
         sents = utils.decode_sequence(vocab, seq_preds)
 
         for k, sent in enumerate(sents):
             video_id = video_ids[k]
             samples[video_id] = [{'image_id': video_id, 'caption': sent}]
-
+            
     with suppress_stdout_stderr():
         valid_score = scorer.score(gts, samples, samples.keys())
     results.append(valid_score)
@@ -79,10 +81,18 @@ def main(opt):
     elif opt["model"] == "S2VTAttModel":
         encoder = EncoderRNN(opt["dim_vid"], opt["dim_hidden"], bidirectional=opt["bidirectional"],
                              input_dropout_p=opt["input_dropout_p"], rnn_dropout_p=opt["rnn_dropout_p"])
-        decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
+        encoder_hand = EncoderRNN(
+            opt["dim_hand"],
+            opt["dim_hand_hidden"],
+            bidirectional=opt["bidirectional"],
+            input_dropout_p=opt["input_dropout_p"],
+            rnn_cell=opt['rnn_type'],
+            rnn_dropout_p=opt["rnn_dropout_p"])
+    
+        decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"]+opt["dim_hand_hidden"], opt["dim_word"],
                              input_dropout_p=opt["input_dropout_p"],
                              rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
-        model = S2VTAttModel(encoder, decoder).cuda()
+        model = S2VTAttModel(encoder, encoder_hand, decoder).cuda()
     #model = nn.DataParallel(model)
     # Setup the model
     model.load_state_dict(torch.load(opt["saved_model"]))

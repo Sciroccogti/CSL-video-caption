@@ -49,7 +49,7 @@ def extract_feats(params, onWrapper):
 
     dir_fc = params['output_dir']
     if not os.path.isdir(dir_fc):
-        os.mkdir(dir_fc)
+        os.makedirs(dir_fc)
     logging.info("save video feats to %s" % (dir_fc))
 
     video_list = glob.glob(os.path.join(params['video_path'], '*.mp4'))
@@ -107,7 +107,7 @@ if __name__ == '__main__':
                         default='data/train-video', help='path to video dataset')
     parser.add_argument("--no_display", default=True, type=str2bool,
                         help="Enable to disable the visual display.")
-    parser.add_argument("--model_folder", type=str, default="./models/",
+    parser.add_argument("--model_folder", type=str, default="./openposemodels/",
                         help="path to openpose models")
     parser.add_argument("--overwrite", dest='overwrite', type=str2bool, default=True,
                         help="Enable to skip existed files")
