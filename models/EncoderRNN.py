@@ -89,7 +89,7 @@ class EncoderRNN(nn.Module):
         :return: 处理过的特征
         """
         # zhixindu = zhixindu.reshape((-1,zhixindu.shape[2]))
-        drop_out = 1 - ((1 - zhixindu) * basepro + basepro / 2)
+        drop_out = 1 - ((1 - zhixindu) * basepro + basepro / 4)
         m = zhixindu.shape[0]
         n =  zhixindu.shape[1]
         r = zhixindu.shape[2]
