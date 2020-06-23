@@ -34,6 +34,11 @@ def parse_opt():
     parser.add_argument('--c3d_feats_dir', type=str, default='data/c3d_feats')
     parser.add_argument(
         '--with_c3d', type=int, default=0, help='whether to use c3d features')
+    parser.add_argument(
+        '--with_hand', type=int, default=0, help='whether to use c3d features')
+    parser.add_argument('--hand_feats_dir', type=str, default='data/feats/openpose')
+
+    parser.add_argument('--visdom', type=int, default=0, help='whether to visualise loss')
 
     parser.add_argument(
         '--cached_tokens',
@@ -55,7 +60,7 @@ def parse_opt():
     parser.add_argument(
         "--bidirectional",
         type=bool,
-        default=False,
+        default=True,
         help="0 for disable, 1 for enable. encoder/decoder bidirectional.")
 
     parser.add_argument(
@@ -63,6 +68,11 @@ def parse_opt():
         type=int,
         default=512,
         help='size of the rnn hidden layer')
+    parser.add_argument(
+        '--dim_hand_hidden',
+        type=int,
+        default=256,
+        help='size of the openpose hidden layer')
     parser.add_argument(
         '--num_layers', type=int, default=1, help='number of layers in the RNN')
     parser.add_argument(
@@ -89,7 +99,11 @@ def parse_opt():
         type=int,
         default=2048,
         help='dim of features of video frames')
-
+    parser.add_argument(
+        '--dim_hand',
+        type=int,
+        default=248,
+        help='dim of features of openpose')
     # Optimization: General
 
     parser.add_argument(
@@ -111,7 +125,7 @@ def parse_opt():
     )
 
     parser.add_argument(
-        '--learning_rate', type=float, default=4e-4, help='learning rate')
+        '--learning_rate', type=float, default=1e-4, help='learning rate')
 
     parser.add_argument(
         '--learning_rate_decay_every',

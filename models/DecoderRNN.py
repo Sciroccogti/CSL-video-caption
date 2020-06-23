@@ -37,7 +37,7 @@ class DecoderRNN(nn.Module):
         self.bidirectional_encoder = bidirectional
 
         self.dim_output = vocab_size
-        self.dim_hidden = dim_hidden * 2 if bidirectional else dim_hidden
+        self.dim_hidden = dim_hidden * 2 if bidirectional else dim_hidden 
         self.dim_word = dim_word
         self.max_length = max_len
         self.sos_id = 1
