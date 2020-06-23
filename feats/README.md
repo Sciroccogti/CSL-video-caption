@@ -26,7 +26,7 @@ use `c3djson_to_npy.py`
 
 ## 2: MFCC features of sound
 
-We did this in [previous work](https://github.com/Paymemoney/Video-Caption), you can find the file `mfcc.py` there.
+Use `mfcc_feats.py` to do that.
 
 ## 3: openpose features of sign language
 

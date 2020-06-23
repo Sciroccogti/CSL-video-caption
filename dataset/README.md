@@ -12,7 +12,7 @@ we will extract c3d feats, which require the videos to have same length,
  or we say, same frame nums. You can use `resample.py` along with `frames_count.py` to do this:
 
 ```bash
-python3 dataset/frames_count.py --video_dir path/to/videos
+python3 dataset/video_info.py --video_dir path/to/videos
 # You will get the statistics characteristics of your videos' frame number.
 # According them you can determine the 'target_frame' for resample.py.
 # We recommend to set the target_frame to median frame num
@@ -34,9 +34,19 @@ We got this:
 
 ## 2: sound
 
-We extract the sound of the videos by ffmpeg.
+We extract the sound of the videos by ffmpeg:
+```bash
+python3 dataset/audio_extract.py --video_dir path/to/videos --target_duration 5.261
+```
+
+We need to normalize the length of mfcc feats, so the extracted audios should have
+ same durations. In our test, we want the length of mfcc feats be as long as those
+ of video feats, which are 224. Thus we should set the target_duration as 5.261
+ = (224 + 8) / 44.1, where `+8` ensures the length is larger than 224 and smaller
+ than 224 + 16
 
 ## 3: hand
+
 We will crop the sign language part out as a new set called "hand" (144*114): 
 
 ```bash

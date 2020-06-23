@@ -6,7 +6,8 @@ tqdm>=4.46.0
 opencv_python>=4.2.0.34
 pretrainedmodels>=0.7.4
 scipy>=1.4.1
-audioread==2.1.8
-librosa==0.7.2
-scikit_learn==0.23.1
-spice==0.12
+audioread>=2.1.8
+librosa==0.6.1
+scikit_learn>=0.23.1
+spice>=0.12
+numba==0.48.0
