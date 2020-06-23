@@ -34,7 +34,8 @@ def parse_opt():
     parser.add_argument('--c3d_feats_dir', type=str, default='data/c3d_feats')
     parser.add_argument(
         '--with_c3d', type=int, default=0, help='whether to use c3d features')
-
+    parser.add_argument(
+        '--with_hand', type=int, default=0, help='whether to use c3d features')
     parser.add_argument('--hand_feats_dir', type=str, default='data/feats/openpose')
 
     parser.add_argument(

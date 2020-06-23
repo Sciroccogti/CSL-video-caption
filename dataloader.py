@@ -36,6 +36,7 @@ class VideoDataset(Dataset):
         self.feats_dir = opt["feats_dir"]
         self.c3d_feats_dir = opt['c3d_feats_dir']
         self.with_c3d = opt['with_c3d']
+        self.with_hand = opt['with_hand']
         self.hand_feats_dir = opt['hand_feats_dir']
         print('load feats from %s' % (self.feats_dir))
         # load in the sequence data
@@ -58,10 +59,11 @@ class VideoDataset(Dataset):
             c3d_feat = np.mean(c3d_feat, axis=0, keepdims=True)
             fc_feat = np.concatenate((fc_feat, np.tile(c3d_feat, (fc_feat.shape[0], 1))), axis=1)
         
-        hand_feat = np.load(os.path.join(self.hand_feats_dir, 'handG_%05i.npy'%(id)))
-        hand_pro = hand_feat[:224, :, 2]
-        hand_pro = np.tile(hand_pro, (1, 2))
-        hand_feat = np.reshape(hand_feat[:224, :, :2], (224, 248))
+        if self.with_hand == 1:
+            hand_feat = np.load(os.path.join(self.hand_feats_dir, 'handG_%05i.npy'%(id)))
+            hand_pro = hand_feat[:224, :, 2]
+            hand_pro = np.tile(hand_pro, (1, 2))
+            hand_feat = np.reshape(hand_feat[:224, :, :2], (224, 248))
         # hand_feat = np.mean(hand_feat, axis=0, keepdims=True)
 
         label = np.zeros(self.max_len)
@@ -85,8 +87,9 @@ class VideoDataset(Dataset):
 
         data = {}
         data['fc_feats'] = torch.from_numpy(fc_feat).type(torch.FloatTensor)
-        data['hand_feats'] = torch.from_numpy(hand_feat).type(torch.FloatTensor)
-        data['hand_pro'] = torch.from_numpy(hand_pro).type(torch.FloatTensor)
+        if self.with_hand == 1:
+            data['hand_feats'] = torch.from_numpy(hand_feat).type(torch.FloatTensor)
+            data['hand_pro'] = torch.from_numpy(hand_pro).type(torch.FloatTensor)
         data['labels'] = torch.from_numpy(label).type(torch.LongTensor)
         data['masks'] = torch.from_numpy(mask).type(torch.FloatTensor)
         data['gts'] = torch.from_numpy(gts).long()
