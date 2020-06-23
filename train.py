@@ -43,6 +43,8 @@ def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
             if opt['with_hand'] == 1:
                 hand_feats = data['hand_feats'].cuda()
                 hand_pro = data['hand_pro'].cuda()
+            if opt['with_voice'] == 1:
+                voice_feats = data['voice_feats'].cuda()
             labels = data['labels'].cuda()
             masks = data['masks'].cuda()
             #print(sc_flag)
@@ -50,9 +52,15 @@ def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
             if not sc_flag:
                 # seq_probs, _ = model(fc_feats, voice_feats, hand_feats, labels, 'train')
                 if opt['with_hand'] == 1:
-                    seq_probs, _ = model(fc_feats, hand_feats, hand_pro, labels, 'train')
+                    if opt['with_voice'] == 0:
+                        seq_probs, _ = model(fc_feats, hand_feats, hand_pro, labels, 'train') # forward
+                    else:
+                        seq_probs, _ = model.forward4(fc_feats, hand_feats, hand_pro, voice_feats, labels, 'train') # forward4 都有
                 else:
-                    seq_probs, _ = model.forward2(fc_feats, labels, 'train')
+                    if opt['with_voice'] == 0:
+                        seq_probs, _ = model.forward2(fc_feats, labels, 'train')  #  forward2 只有视频
+                    else:
+                        seq_probs, _ = model.forward3(fc_feats, labels, 'train')  #  forward3 声音加视频
                 loss = crit(seq_probs, labels[:, 1:], masks[:, 1:])
             # todo 下面else部分没有修改声音和手语的内容
             else:
@@ -111,14 +119,15 @@ def main(opt):
             input_dropout_p=opt["input_dropout_p"],
             rnn_cell=opt['rnn_type'],
             rnn_dropout_p=opt["rnn_dropout_p"])
-        # # 声音encoder
-        # encoder_voice = EncoderRNN(
-        #     opt["dim_voice"],
-        #     opt["dim_hidden"],
-        #     bidirectional=opt["bidirectional"],
-        #     input_dropout_p=opt["input_dropout_p"],
-        #     rnn_cell=opt['rnn_type'],
-        #     rnn_dropout_p=opt["rnn_dropout_p"])
+        # 声音encoder
+        if opt['with_voice'] == 1:
+            encoder_voice = EncoderRNN(
+                opt["dim_voice"],
+                opt["dim_voice_hidden"],
+                bidirectional=opt["bidirectional"],
+                input_dropout_p=opt["input_dropout_p"],
+                rnn_cell=opt['rnn_type'],
+                rnn_dropout_p=opt["rnn_dropout_p"])
         # 手语encoder
         if opt['with_hand'] == 1:
             encoder_hand = EncoderRNN(
@@ -128,6 +137,18 @@ def main(opt):
                 input_dropout_p=opt["input_dropout_p"],
                 rnn_cell=opt['rnn_type'],
                 rnn_dropout_p=opt["rnn_dropout_p"])
+        if opt['with_hand'] == 1 and opt['with_voice'] == 1:
+            decoder = DecoderRNN(
+                opt["vocab_size"],
+                opt["max_len"],
+                opt["dim_hidden"] + opt["dim_hand_hidden"] + opt["dim_voice_hidden"],
+                opt["dim_word"],
+                input_dropout_p=opt["input_dropout_p"],
+                rnn_cell=opt['rnn_type'],
+                rnn_dropout_p=opt["rnn_dropout_p"],
+                bidirectional=opt["bidirectional"])
+            model = S2VTAttModel(encoder, encoder_hand, encoder_voice, decoder)
+        elif opt['with_hand'] == 1:
             decoder = DecoderRNN(
                 opt["vocab_size"],
                 opt["max_len"],
@@ -137,18 +158,29 @@ def main(opt):
                 rnn_cell=opt['rnn_type'],
                 rnn_dropout_p=opt["rnn_dropout_p"],
                 bidirectional=opt["bidirectional"])
-            model = S2VTAttModel(encoder, encoder_hand, decoder)
-        else:
+            model = S2VTAttModel(encoder, encoder_hand, None, decoder)
+        elif opt['with_voice'] == 1:
             decoder = DecoderRNN(
                 opt["vocab_size"],
                 opt["max_len"],
-                opt["dim_hidden"],
+                opt["dim_hidden"] + opt["dim_voice_hidden"],
                 opt["dim_word"],
                 input_dropout_p=opt["input_dropout_p"],
                 rnn_cell=opt['rnn_type'],
                 rnn_dropout_p=opt["rnn_dropout_p"],
                 bidirectional=opt["bidirectional"])
-            model = S2VTAttModel(encoder, None, decoder)
+            model = S2VTAttModel(encoder, None, encoder_voice, decoder)
+        else:
+            decoder = DecoderRNN(
+            opt["vocab_size"],
+            opt["max_len"],
+            opt["dim_hidden"],
+            opt["dim_word"],
+            input_dropout_p=opt["input_dropout_p"],
+            rnn_cell=opt['rnn_type'],
+            rnn_dropout_p=opt["rnn_dropout_p"],
+            bidirectional=opt["bidirectional"])
+            model = S2VTAttModel(encoder, None, None, decoder)
         # model = S2VTAttModel(encoder, encoder_voice, encoder_hand, decoder)
         
     model = model.cuda()

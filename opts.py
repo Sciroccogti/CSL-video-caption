@@ -35,9 +35,11 @@ def parse_opt():
     parser.add_argument(
         '--with_c3d', type=int, default=0, help='whether to use c3d features')
     parser.add_argument(
-        '--with_hand', type=int, default=0, help='whether to use c3d features')
+        '--with_hand', type=int, default=0, help='whether to use hand features')
     parser.add_argument('--hand_feats_dir', type=str, default='data/feats/openpose')
-
+    parser.add_argument(
+        '--with_voice', type=int, default=0, help='whether to use voice features')
+    parser.add_argument('--voice_feats_dir', type=str, default='data/feats/mfcc')
     parser.add_argument(
         '--cached_tokens',
         type=str,
@@ -72,6 +74,11 @@ def parse_opt():
         default=256,
         help='size of the openpose hidden layer')
     parser.add_argument(
+        '--dim_voice_hidden',
+        type=int,
+        default=128,
+        help='size of the openpose hidden layer')
+    parser.add_argument(
         '--num_layers', type=int, default=1, help='number of layers in the RNN')
     parser.add_argument(
         '--input_dropout_p',
@@ -101,6 +108,11 @@ def parse_opt():
         '--dim_hand',
         type=int,
         default=248,
+        help='dim of features of openpose')
+    parser.add_argument(
+        '--dim_voice',
+        type=int,
+        default=60,
         help='dim of features of openpose')
     # Optimization: General
 

@@ -37,7 +37,9 @@ class VideoDataset(Dataset):
         self.c3d_feats_dir = opt['c3d_feats_dir']
         self.with_c3d = opt['with_c3d']
         self.with_hand = opt['with_hand']
+        self.with_voice = opt['with_voice']
         self.hand_feats_dir = opt['hand_feats_dir']
+        self.voice_feats_dir = opt['voice_feats_dir']
         print('load feats from %s' % (self.feats_dir))
         # load in the sequence data
         self.max_len = opt["max_len"]
@@ -64,6 +66,10 @@ class VideoDataset(Dataset):
             hand_pro = hand_feat[:224, :, 2]
             hand_pro = np.tile(hand_pro, (1, 2))
             hand_feat = np.reshape(hand_feat[:224, :, :2], (224, 248))
+
+        if self.with_voice == 1:
+            voice_feats = np.load(os.path.join(self.voice_feats_dir, 'mfcc_G_%05i.npy'%(id)))
+            voice_feats = voice_feats[:60, :224].T
         # hand_feat = np.mean(hand_feat, axis=0, keepdims=True)
 
         label = np.zeros(self.max_len)
@@ -90,6 +96,8 @@ class VideoDataset(Dataset):
         if self.with_hand == 1:
             data['hand_feats'] = torch.from_numpy(hand_feat).type(torch.FloatTensor)
             data['hand_pro'] = torch.from_numpy(hand_pro).type(torch.FloatTensor)
+        if self.with_voice == 1:
+            data['voice_feats'] = torch.from_numpy(voice_feats).type(torch.FloatTensor)
         data['labels'] = torch.from_numpy(label).type(torch.LongTensor)
         data['masks'] = torch.from_numpy(mask).type(torch.FloatTensor)
         data['gts'] = torch.from_numpy(gts).long()
