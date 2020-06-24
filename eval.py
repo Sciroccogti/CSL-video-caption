@@ -41,16 +41,18 @@ def test(model, crit, dataset, vocab, opt):
         if opt['with_hand'] == 1:
             hand_feats = data['hand_feats'].cuda()
             hand_pro = data['hand_pro'].cuda()
+        if opt['with_voice'] == 1:
+            voice_feats = data['voice_feats'].cuda()
         labels = data['labels'].cuda()
         masks = data['masks'].cuda()
         video_ids = data['video_ids']
 
         # forward the model to also get generated samples for each image
         with torch.no_grad():
-            if opt['with_hand'] == 1:
-                seq_probs, _ = model(fc_feats, hand_feats, hand_pro, mode='inference', opt=opt)
+            if opt['with_hand'] == 1 and opt['with_voice'] == 1:
+                seq_probs, seq_preds = model.forward4(fc_feats, hand_feats, hand_pro, voice_feats, mode='inference', opt=opt)
             else:
-                seq_probs, _ = model.forward2(fc_feats, mode='inference', opt=opt)
+                seq_probs, seq_preds = model.forward2(fc_feats, mode='inference', opt=opt)
                 # loss = crit(seq_probs, labels[:, 1:], masks[:, 1:])
             # seq_probs, seq_preds = model(
             #     fc_feats, hand_feats, hand_pro, mode='inference', opt=opt)
@@ -87,7 +89,7 @@ def main(opt):
     elif opt["model"] == "S2VTAttModel":
         encoder = EncoderRNN(opt["dim_vid"], opt["dim_hidden"], bidirectional=opt["bidirectional"],
                              input_dropout_p=opt["input_dropout_p"], rnn_dropout_p=opt["rnn_dropout_p"])
-        if opt['with_hand'] == 1:
+        if opt['with_hand'] == 1 and opt['with_voice'] == 1:
             encoder_hand = EncoderRNN(
                 opt["dim_hand"],
                 opt["dim_hand_hidden"],
@@ -95,18 +97,26 @@ def main(opt):
                 input_dropout_p=opt["input_dropout_p"],
                 rnn_cell=opt['rnn_type'],
                 rnn_dropout_p=opt["rnn_dropout_p"])
-            decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"]+opt["dim_hand_hidden"], opt["dim_word"],
+            encoder_voice = EncoderRNN(
+                opt["dim_voice"],
+                opt["dim_voice_hidden"],
+                bidirectional=opt["bidirectional"],
+                input_dropout_p=opt["input_dropout_p"],
+                rnn_cell=opt['rnn_type'],
+                rnn_dropout_p=opt["rnn_dropout_p"])
+            decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"]+opt["dim_hand_hidden"] + opt["dim_voice_hidden"], opt["dim_word"],
                                 input_dropout_p=opt["input_dropout_p"],
                                 rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
-            model = S2VTAttModel(encoder, encoder_hand, decoder).cuda()
+            model = S2VTAttModel(encoder, encoder_hand, encoder_voice, decoder).cuda()
         else:
             decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
                                 input_dropout_p=opt["input_dropout_p"],
                                 rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
-            model = S2VTAttModel(encoder, None, decoder).cuda()
+            model = S2VTAttModel(encoder, None, None, decoder).cuda()
     #model = nn.DataParallel(model)
     # Setup the model
     model.load_state_dict(torch.load(opt["saved_model"]))
+    # print(model)
     crit = utils.LanguageModelCriterion()
 
     test(model, crit, dataset, dataset.get_vocab(), opt)
