@@ -112,6 +112,16 @@ def main(opt):
                                 input_dropout_p=opt["input_dropout_p"],
                                 rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
             model = S2VTAttModel(encoder, encoder_hand, encoder_voice, decoder).cuda()
+        elif opt['with_hand'] == 1:
+            decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
+                                input_dropout_p=opt["input_dropout_p"],
+                                rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
+            model = S2VTAttModel(encoder, encoder_hand, None, decoder).cuda()
+        elif opt['with_voice'] == 1:
+            decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
+                                input_dropout_p=opt["input_dropout_p"],
+                                rnn_dropout_p=opt["rnn_dropout_p"], bidirectional=opt["bidirectional"])
+            model = S2VTAttModel(encoder, None, encoder_voice, decoder).cuda()
         else:
             decoder = DecoderRNN(opt["vocab_size"], opt["max_len"], opt["dim_hidden"], opt["dim_word"],
                                 input_dropout_p=opt["input_dropout_p"],
