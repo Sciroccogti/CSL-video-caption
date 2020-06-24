@@ -51,6 +51,10 @@ def test(model, crit, dataset, vocab, opt):
         with torch.no_grad():
             if opt['with_hand'] == 1 and opt['with_voice'] == 1:
                 seq_probs, seq_preds = model.forward4(fc_feats, hand_feats, hand_pro, voice_feats, mode='inference', opt=opt)
+            elif opt['with_hand'] == 1:
+                seq_probs, seq_preds = model(fc_feats, hand_feats, hand_pro, mode='inference', opt=opt)
+            elif opt['with_voice'] == 1:
+                seq_probs, seq_preds = model.forward3(fc_feats, voice_feats, mode='inference', opt=opt)
             else:
                 seq_probs, seq_preds = model.forward2(fc_feats, mode='inference', opt=opt)
                 # loss = crit(seq_probs, labels[:, 1:], masks[:, 1:])
