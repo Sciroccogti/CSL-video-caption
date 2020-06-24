@@ -55,7 +55,7 @@ class S2VTAttModel(nn.Module):
         seq_prob, seq_preds = self.decoder(encoder_outputs, encoder_hidden, target_variable, mode, opt)
         return seq_prob, seq_preds
 
-    def forward3(self, vid_feats, hand_feats, hand_pro, target_variable=None,
+    def forward3(self, vid_feats, voice_feats, target_variable=None,
             mode='train', opt={}):
         encoder_outputs1, encoder_hidden1 = self.encoder(vid_feats)
         # todo 修改下面的vid_feats，变成声音和手语的特征,同时要传入参数
