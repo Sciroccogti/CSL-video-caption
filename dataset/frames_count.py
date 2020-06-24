@@ -14,9 +14,14 @@ videoList += glob.glob(os.path.join(params['video_dir'], '*.avi'))
 videoList.sort()
 frame = []
 
+print("问题video")
 for video in videoList:
     cap = cv.VideoCapture(video)
-    frame.append(cap.get(7))
+    tmp = cap.get(7)
+    if tmp<48:
+        #delete
+        print(video)
+    frame.append(tmp)
 
 print('number:', len(frame))
 print('median frame num:', np.median(frame))
