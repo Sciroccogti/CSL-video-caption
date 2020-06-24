@@ -40,6 +40,9 @@ def parse_opt():
     parser.add_argument(
         '--with_voice', type=int, default=0, help='whether to use voice features')
     parser.add_argument('--voice_feats_dir', type=str, default='data/feats/mfcc')
+
+    parser.add_argument('--visdom', type=int, default=0, help='whether to visualise loss')
+
     parser.add_argument(
         '--cached_tokens',
         type=str,

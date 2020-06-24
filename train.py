@@ -18,8 +18,9 @@ import visdom
 
 def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
     model.train()
-    # viz = visdom.Visdom(env='train')
-    # loss_win = viz.line(np.arange(1), opts={'title':'loss'})
+    if opt['visdom']:
+        viz = visdom.Visdom(env='train')
+        loss_win = viz.line(np.arange(1), opts={'title':'loss'})
     
     for epoch in range(opt["epochs"]):
         lr_scheduler.step()
@@ -81,7 +82,8 @@ def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
             if not sc_flag:
                 print("?iter %d (epoch %d), train_loss = %.6f" %
                       (iteration, epoch, train_loss))
-                # viz.line(Y=np.array([train_loss]), X=np.array([epoch]), win=loss_win, update='append')
+                if opt['visdom']:
+                    viz.line(Y=np.array([train_loss]), X=np.array([epoch]), win=loss_win, update='append')
             else:
                 print("??iter %d (epoch %d), avg_reward = %.6f" %
                       (iteration, epoch, np.mean(reward[:, 0])))
