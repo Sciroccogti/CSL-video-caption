@@ -54,6 +54,7 @@ def extract_feats(params, onWrapper):
 
     video_list = glob.glob(os.path.join(params['video_path'], '*.mp4'))
     video_list += glob.glob(os.path.join(params['video_path'], '*.avi'))
+    video_list.sort()
     pbar = tqdm(video_list)
     for video in pbar:
         video_id = video.split("/")[-1].split(".")[0]
@@ -101,8 +102,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--output_dir", dest='output_dir', type=str,
                         default='data/feats/openpose', help='directory to store features')
-    parser.add_argument("--n_frame_steps", dest='n_frame_steps', type=int, default=40,
-                        help='how many frames to sampler per video')
     parser.add_argument("--video_path", dest='video_path', type=str,
                         default='data/train-video', help='path to video dataset')
     parser.add_argument("--no_display", default=True, type=str2bool,
@@ -124,7 +123,6 @@ if __name__ == '__main__':
     params = vars(args)
     opParams = params.copy()
     opParams.pop('output_dir')
-    opParams.pop('n_frame_steps')
     opParams.pop('video_path')
     opParams.pop('no_display')
     opParams.pop('overwrite')
