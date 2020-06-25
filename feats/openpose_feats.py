@@ -68,6 +68,10 @@ def extract_feats(params, onWrapper):
             continue
 
         image_list = sorted(glob.glob(os.path.join(dst, '*.jpg')))
+
+        samples = np.round(np.linspace(
+            0, len(image_list) - 1, params['n_frame_steps']))
+        image_list = [image_list[int(sample)] for sample in samples]
         # 124 = 12 + 70 + 21*2, 3: x, y, confidence
         video_feats = np.zeros((len(image_list), 124, 3))
         i = 0
@@ -104,6 +108,8 @@ if __name__ == '__main__':
                         default='data/feats/openpose', help='directory to store features')
     parser.add_argument("--video_path", dest='video_path', type=str,
                         default='data/train-video', help='path to video dataset')
+    parser.add_argument("--n_frame_steps", dest='n_frame_steps', type=int, default=40,
+                        help='how many frames to sampler per video')
     parser.add_argument("--no_display", default=True, type=str2bool,
                         help="Enable to disable the visual display.")
     parser.add_argument("--model_folder", type=str, default="./openposemodels/",
@@ -126,6 +132,7 @@ if __name__ == '__main__':
     opParams.pop('video_path')
     opParams.pop('no_display')
     opParams.pop('overwrite')
+    opParams.pop('n_frame_steps')
     opParams["face"] = True
     opParams["hand"] = True
 
