@@ -18,10 +18,13 @@ print("问题video")
 for video in videoList:
     cap = cv.VideoCapture(video)
     tmp = cap.get(7)
-    if tmp<48:
+    if tmp<48 and tmp > 1.0:
         #delete
         print(video)
-    frame.append(tmp)
+    if tmp <= 1.0:
+        print(video)
+    else:
+        frame.append(tmp)
 
 print('number:', len(frame))
 print('median frame num:', np.median(frame))
