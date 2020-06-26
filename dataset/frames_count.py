@@ -18,7 +18,7 @@ print("问题video")
 for video in videoList:
     cap = cv.VideoCapture(video)
     tmp = cap.get(7)
-    if tmp<48 and tmp > 1.0:
+    if tmp<40 :#and tmp > 1.0:
         #delete
         print(video)
     if tmp <= 1.0:
