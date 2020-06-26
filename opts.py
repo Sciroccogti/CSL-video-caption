@@ -7,7 +7,7 @@ def parse_opt():
     parser.add_argument(
         '--input_json',
         type=str,
-        default='data/English_caption(400-590).json',
+        default='data/english_caption.json',
         help='path to the json file containing video info')
     parser.add_argument(
         '--info_json',
@@ -20,18 +20,13 @@ def parse_opt():
         default='data/caption.json',
         help='path to the processed video caption json')
     parser.add_argument(
-        '--mapping_json',
-        type=str,
-        default='data/mapping.json',  # 储存的是自定义编号到视频映射
-        help='path to the json file containing mapping')
-    parser.add_argument(
         '--feats_dir',
         nargs='*',
         type=str,
         default='data/feats/',
         help='path to the directory containing the preprocessed fc feats')
 
-    parser.add_argument('--c3d_feats_dir', type=str, default='data/c3d_feats')
+    parser.add_argument('--c3d_feats_dir', type=str, default='data/feats/c3d_feats')
     parser.add_argument(
         '--with_c3d', type=int, default=0, help='whether to use c3d features')
     parser.add_argument(

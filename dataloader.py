@@ -63,19 +63,19 @@ class VideoDataset(Dataset):
         
         if self.with_hand == 1:
             hand_feat = np.load(os.path.join(self.hand_feats_dir, 'handG_%05i.npy'%(id)))
-            hand_pro = hand_feat[:224, :, 2]
+            hand_pro = hand_feat[:40, :, 2]
             hand_pro = np.tile(hand_pro, (1, 2))
-            hand_feat = np.reshape(hand_feat[:224, :, :2], (224, 248))
+            hand_feat = np.reshape(hand_feat[:40, :, :2], (40, 248))
 
         if self.with_voice == 1:
             voice_feats = np.load(os.path.join(self.voice_feats_dir, 'mfcc_G_%05i.npy'%(id)))
-            voice_feats = voice_feats[:60, :224].T
+            voice_feats = voice_feats[:60, :40].T
         # hand_feat = np.mean(hand_feat, axis=0, keepdims=True)
 
         label = np.zeros(self.max_len)
         mask = np.zeros(self.max_len)
         captions = self.captions['G_%05i'%(id)]['final_captions']
-        gts = np.zeros((9, self.max_len))
+        gts = np.zeros((len(captions), self.max_len))
         for i, cap in enumerate(captions):
             if len(cap) > self.max_len:
                 cap = cap[:self.max_len]
@@ -86,7 +86,7 @@ class VideoDataset(Dataset):
                 gts[i, j] = self.word_to_ix[w]
 
         # random select a caption for this video
-        cap_ix = random.randint(0, 8)
+        cap_ix = random.randint(0, len(captions) - 1)
         label = gts[cap_ix]
         non_zero = (label == 0).nonzero()
         mask[:int(non_zero[0][0]) + 1] = 1
