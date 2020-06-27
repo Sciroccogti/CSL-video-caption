@@ -62,7 +62,7 @@ class VideoDataset(Dataset):
             fc_feat = np.concatenate((fc_feat, c3d_feat), axis=1)
         
         if self.with_hand == 1:
-            hand_feat = np.load(os.path.join(self.hand_feats_dir, 'handG_%05i.npy'%(id)))
+            hand_feat = np.load(os.path.join(self.hand_feats_dir, 'G_%05ihand.npy'%(id)))
             hand_pro = hand_feat[:40, :, 2]
             hand_pro = np.tile(hand_pro, (1, 2))
             hand_feat = np.reshape(hand_feat[:40, :, :2], (40, 248))

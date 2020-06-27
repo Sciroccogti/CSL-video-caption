@@ -61,7 +61,7 @@ def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
                     if opt['with_voice'] == 0:
                         seq_probs, _ = model.forward2(fc_feats, labels, 'train')  #  forward2 只有视频
                     else:
-                        seq_probs, _ = model.forward3(fc_feats, labels, 'train')  #  forward3 声音加视频
+                        seq_probs, _ = model.forward3(fc_feats, voice_feats, labels, 'train')  #  forward3 声音加视频
                 loss = crit(seq_probs, labels[:, 1:], masks[:, 1:])
             # todo 下面else部分没有修改声音和手语的内容
             else:

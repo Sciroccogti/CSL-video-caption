@@ -75,7 +75,7 @@ def parse_opt():
         '--dim_voice_hidden',
         type=int,
         default=128,
-        help='size of the openpose hidden layer')
+        help='size of the voice hidden layer')
     parser.add_argument(
         '--num_layers', type=int, default=1, help='number of layers in the RNN')
     parser.add_argument(
