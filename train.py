@@ -17,6 +17,7 @@ import visdom
 
 
 def train(loader, model, crit, optimizer, lr_scheduler, opt, rl_crit=None):
+    model = torch.nn.DataParallel(model)
     model.train()
     if opt['visdom']:
         viz = visdom.Visdom(env='train')
