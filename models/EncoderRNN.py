@@ -99,4 +99,4 @@ class EncoderRNN(nn.Module):
         drop_out = torch.rand(m, n, r).cuda() + drop_out
         b = torch.ones(m, n, r).cuda()
         drop_out = drop_out > b + 0  # 这里生成0 1矩阵
-        return drop_out * input
+        return drop_out.float() * input
